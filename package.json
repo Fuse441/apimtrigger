@@ -1,0 +1,61 @@
+{
+  "name": "apimtrigger",
+  "displayName": "apimTrigger",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:json"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "json",
+        "extensions": [".json"],
+        "aliases": ["JSON"]
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "extension.showValueMessage",
+          "when": "editorTextFocus",
+          "group": "navigation"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "extension.showValueMessage",
+        "title": "Show JSON Value Message"
+      }
+    ],
+     "keybindings": [
+      {
+        "command": "extension.showValueMessage",
+        "key": "ctrl+alt+r", 
+        "mac": "ctrl+alt+r",  
+        "when": "editorTextFocus"
+      }
+    ]
+  },  
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.95.0",
+    "@types/mocha": "^10.0.9",
+    "@types/node": "20.x",
+    "eslint": "^9.13.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}
