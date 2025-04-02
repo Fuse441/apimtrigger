@@ -1,67 +1,85 @@
 const vscode = require('vscode');
-const fs = require('fs');
-const path = require('path');
 
+const outputChannel = vscode.window.createOutputChannel("Apim Trigger");
 function activate(context) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('extension.showValueMessage', () => {
+        vscode.commands.registerCommand('extension.apimTrigger', () => {
             const editor = vscode.window.activeTextEditor;
             if (editor) {
-                const selectedText = editor.document.getText(editor.selection);
-                if (selectedText.includes("@TABLE")) {
-                    const match = selectedText.match(/@TABLE\.(.+)/);
+                outputChannel.clear(); 
+                outputChannel.appendLine("👩🏻‍💻 Apim Trigger Active ! 👩🏻‍💻");
+               
+                const lineNumber = editor.selection.active.line; // ดึงบรรทัดที่เคอร์เซอร์อยู่
+                const lineText = editor.document.lineAt(lineNumber).text;
+                // outputChannel.appendLine(String(lineText));
+              
+                if (lineText.includes("@TABLE")) {
+                    const match = lineText.match(/@TABLE\.(.+)/);
                     const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : null;
-                    const parts = match[1].split('.'); // แยก string ตาม .
+                    const parts = match[1].split('.'); 
+                    let condition = ""
+                    if(parts.length > 2) {
+                        condition = parts[2] 
+                        condition = condition.replace(/[,]/g, "")
+                    }
+
+                    // console.log("condition ==> ", condition);
                     const dotCount = parts.length - 1;
-                    // vscode.window.showInformationMessage(dotCount.toString());
+                    
                     if (dotCount == 1) {
                         let fileName = ""
+                      
                         if(match[1].includes("condition")){
                             dotCount == 1 ? fileName = ".json" : fileName = ""
+                            
                         }else{
                             fileName = ".json"
                         }
-                        const filePath = workspaceFolder.concat("/",match[1].replace(/\./g, '/'),fileName);
-                  
-                     vscode.window.showInformationMessage(filePath);
+                        
+                        const filePath = workspaceFolder.concat("/", match[1].replace(/\./g, "/").replace(/[" ,]/g, ""), fileName);
+                        
+                        
+                        
+                      outputChannel.appendLine("👉 redirectStep to ==> " + String(parts).trim());
+                    //  vscode.window.showInformationMessage(filePath);
+                     outputChannel.show(); 
                        return vscode.commands.executeCommand('vscode.open', vscode.Uri.file(filePath));
                         
                     }else{
                         const filePath = vscode.Uri.file( match[1].split('.').slice(0, -1).join('/') + '.json'); // เอาทุกส่วนที่เป็น path (ยกเว้น object ท้ายสุด)
                         const fullFilePath = workspaceFolder + '/' + filePath.path.substring(1); // ใช้ path ที่แปลงแล้ว
                        
-                        const objectKey = parts[parts.length - 1]; // คำสุดท้ายคือ object key
+                        
+                        return vscode.workspace.openTextDocument(vscode.Uri.file(fullFilePath)).then((doc) => {
+                            vscode.window.showTextDocument(doc).then((editor) => {
+                                const text = doc.getText();
+                                // console.log("text ==> ", text);
+                        
+                                // ใช้ Regex หา key ที่ตรงกับ condition
+                                const regex = new RegExp(`"(${condition})\\s*:`, "g");
+                                const match = regex.exec(text);
+                        
+                                if (match) {
+                                    const index = match.index; // ตำแหน่งที่พบ Key
+                                    // console.log("index ==> ", index);
+                        
+                                    const position = doc.positionAt(index);
+                                    // console.log("position ==> ", position);
+                                    editor.selection = new vscode.Selection(position, position);
+                                    editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+                                    outputChannel.appendLine("👉 redirectStep condition to ==> " + String(condition).trim());
 
-                        // vscode.window.showInformationMessage('Selected object: ' + objectKey);
-                         return vscode.commands.executeCommand('vscode.open', vscode.Uri.file(fullFilePath));
+                                } else {
+                                    vscode.window.showInformationMessage(`Key "${condition}" not found`);
+                                }
+                            });
+                        });
+                        
+                
 
-                        //  fs.readFile(fullFilePath, 'utf8', (err, data) => {
-    
-                        //     try {
-                        //         const jsonData = JSON.parse(data);
-                        //         vscode.window.showInformationMessage(jsonData);
-                             
-                        //         if (jsonData[objectKey]) {
-                        //             // ถ้าเจอ object, ค้นหาตำแหน่งของ object ในไฟล์
-                        //             const objectText = JSON.stringify(jsonData[objectKey], null, 2);
-                        //             const document = vscode.window.activeTextEditor.document;
+                        //  return vscode.commands.executeCommand('vscode.open', vscode.Uri.file(fullFilePath));
 
-                        //             // ค้นหาตำแหน่งของ object ในไฟล์
-                        //             const index = document.getText().indexOf(objectText);
-                        //             if (index >= 0) {
-                        //                 // สร้าง Range ไปยังตำแหน่งที่เจอ
-                        //                 const position = document.positionAt(index);
-                        //                 const range = new vscode.Range(position, position);
-                                        
-                        //                 // เลื่อน cursor ไปยังตำแหน่ง
-                        //                 vscode.window.activeTextEditor.selection = new vscode.Selection(position, position);
-                        //                 vscode.window.activeTextEditor.revealRange(range);
-                        //             }
-                        //         }                                
-                        //     } catch (error) {
-                        //         vscode.window.showInformationMessage(error);
-                        //     }
-                        //  })
+                        
                            
 
           

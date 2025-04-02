@@ -2,7 +2,8 @@
   "name": "apimtrigger",
   "displayName": "apimTrigger",
   "description": "",
-  "version": "0.0.1",
+  "version": "1.1.0",
+  "publisher": "Jiranon",
   "engines": {
     "vscode": "^1.95.0"
   },
@@ -24,7 +25,7 @@
     "menus": {
       "editor/context": [
         {
-          "command": "extension.showValueMessage",
+          "command": "extension.apimTrigger",
           "when": "editorTextFocus",
           "group": "navigation"
         }
@@ -32,15 +33,15 @@
     },
     "commands": [
       {
-        "command": "extension.showValueMessage",
+        "command": "extension.apimTrigger",
         "title": "Show JSON Value Message"
       }
     ],
      "keybindings": [
       {
-        "command": "extension.showValueMessage",
-        "key": "ctrl+alt+r", 
-        "mac": "ctrl+alt+r",  
+        "command": "extension.apimTrigger",
+        "key": "ctrl+alt+f", 
+        "mac": "ctrl+alt+f",  
         "when": "editorTextFocus"
       }
     ]
