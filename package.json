@@ -2,7 +2,7 @@
   "name": "apimtrigger",
   "displayName": "apimTrigger",
   "description": "",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "publisher": "Jiranon",
   "engines": {
     "vscode": "^1.95.0"

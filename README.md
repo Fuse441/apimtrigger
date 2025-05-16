@@ -9,6 +9,7 @@ Instantly jump to definitions in your VS Code project with just **one key combin
 - **Regex-Based Matching**: Finds and highlights the target key instantly.
 - **Auto File Opening**: If the target is in another file, it opens it for you.
 - **Works on JSON & Config Files**: No more manual scrolling!
+- **ScanLens**: Check RedirectStep in Line and show Message to User.
 
 ## 🛠️ How to Use
 1. Place your cursor on a line with a reference.
