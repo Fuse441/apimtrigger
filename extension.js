@@ -104,40 +104,23 @@ function activate(context) {
 function analyzeDocument(editor) {
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
   if (!workspaceFolder) return;
-  // const editor = vscode.window.activeTextEditor;
-
   if (!editor) return;
+
   const decorations = [];
+  const diagnostics = [];
+
   const textLines = editor.document.getText().split("\n");
 
   for (let lineNumber = 0; lineNumber < textLines.length; lineNumber++) {
     const lineText = textLines[lineNumber];
-    const matches = [...lineText.matchAll(/@TABLE\.([a-zA-Z0-9_.]+)/g)];
+    const matches = [...lineText.matchAll(/@TABLE\.([a-zA-Z0-9_.-]+)/g)];
 
     for (const match of matches) {
       const rawPath = match[1];
       const parts = rawPath.split(".");
-      console.log("parts ==> ", parts);
       const checkFile = path.join(...parts.slice(0, 2)) + ".json";
-      console.log("checkFile ==> ", checkFile);
-      // fs.readFileSync(path.join(parts));
       const dotCount = parts.length - 1;
       const condition = parts[2]?.replace(/[,]/g, "") || "";
-
-      let decorationText = "";
-      console.log(
-        "path ==> ",
-        path.join(workspaceFolder, checkFile),
-        fs.existsSync(path.join(workspaceFolder, checkFile))
-      );
-      if (fs.existsSync(path.join(workspaceFolder, checkFile))) {
-        decorationText = `🔄️ redirectStep ➜ ${rawPath.replace(
-          /\./g,
-          "/"
-        )}.json`;
-      } else {
-        decorationText = `❌ Unable to locate file or condition`;
-      }
 
       const range = new vscode.Range(
         lineNumber,
@@ -145,6 +128,26 @@ function analyzeDocument(editor) {
         lineNumber,
         match.index + match[0].length
       );
+
+      let decorationText = "";
+      const filePath = path.join(workspaceFolder, checkFile);
+
+      if (fs.existsSync(filePath)) {
+        decorationText = `🔄️ redirectStep ➜ ${rawPath.replace(
+          /\./g,
+          "/"
+        )}.json`;
+      } else {
+        decorationText = `❌ Unable to locate file or condition`;
+
+        diagnostics.push(
+          new vscode.Diagnostic(
+            range,
+            `File not found: ${filePath}`,
+            vscode.DiagnosticSeverity.Error
+          )
+        );
+      }
 
       decorations.push({
         range,
@@ -158,6 +161,10 @@ function analyzeDocument(editor) {
       });
     }
   }
+
+  const diagnosticCollection =
+    vscode.languages.createDiagnosticCollection("apimTrigger");
+  diagnosticCollection.set(editor.document.uri, diagnostics);
 
   editor.setDecorations(decorationType, decorations);
 }
