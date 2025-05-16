@@ -3,7 +3,7 @@
   "displayName": "apimTrigger",
   "description": "",
   "version": "1.3.0",
-  "publisher": "Jiranon",
+  "publisher": "Demon-APIM",
   "engines": {
     "vscode": "^1.95.0"
   },
