@@ -140,13 +140,13 @@ function analyzeDocument(editor) {
       } else {
         decorationText = `❌ Unable to locate file or condition`;
 
-        diagnostics.push(
-          new vscode.Diagnostic(
-            range,
-            `File not found: ${filePath}`,
-            vscode.DiagnosticSeverity.Error
-          )
-        );
+        // diagnostics.push(
+        //   new vscode.Diagnostic(
+        //     range,
+        //     `File not found: ${filePath}`,
+        //     vscode.DiagnosticSeverity.Error
+        //   )
+        // );
       }
 
       decorations.push({
